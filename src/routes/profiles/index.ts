@@ -37,9 +37,13 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity> {
-      const user = await fastify.db.users.findOne({key:'id', equals:request.body.userId}); 
+      const profile = await fastify.db.profiles.findOne({key:'userId', equals:request.body.userId}); 
 
-      if (user) throw fastify.httpErrors.badRequest('badRequest: user already has a profile!');
+      if (profile) throw fastify.httpErrors.badRequest('badRequest: user already has a profile!');
+
+      if (request.body.memberTypeId !== 'basic' && request.body.memberTypeId !== 'business' ) 
+        throw fastify.httpErrors.badRequest('badRequest: memberTypeId not validate!');
+
       return await fastify.db.profiles.create(request.body);
     }
   );
@@ -78,7 +82,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
 
       const profile = await fastify.db.profiles.findOne({key:'id', equals:profileId}); 
       if (!profile) 
-        throw fastify.httpErrors.createError(404, 'This profile does not exist!');
+        throw fastify.httpErrors.notFound('This profile does not exist!');
       
       return fastify.db.profiles.change(profileId, request.body);
     }

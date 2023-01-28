@@ -2,7 +2,6 @@ import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-sc
 import { idParamSchema } from '../../utils/reusedSchemas';
 import { changeMemberTypeBodySchema } from './schema';
 import type { MemberTypeEntity } from '../../utils/DB/entities/DBMemberTypes';
-import { validate } from 'uuid';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -39,7 +38,8 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     },
     async function (request, reply): Promise<MemberTypeEntity> {
       const memberTypeId = request.params.id;
-      if (!validate(request.params.id)) throw fastify.httpErrors.badRequest('badRequest: id not validate!');
+      if (request.params.id !== 'basic' && request.params.id !== 'business' ) 
+        throw fastify.httpErrors.badRequest('badRequest: id not validate!');
 
       const memberType = await fastify.db.memberTypes.findOne({key:'id', equals:memberTypeId}); 
       if (!memberType) 

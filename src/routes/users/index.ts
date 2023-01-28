@@ -59,6 +59,21 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       const user = await fastify.db.users.findOne({key:'id', equals:userId}); 
       if (!user) 
         throw fastify.httpErrors.notFound('This user does not exist!');
+
+      let subscribed = await fastify.db.users.findMany({key:'subscribedToUserIds', inArray:userId});
+   
+      subscribed.forEach(async(i) => {
+          i.subscribedToUserIds = i.subscribedToUserIds.filter(s => s !== userId); 
+          await fastify.db.users.change(i.id, i);
+        } 
+      );
+
+
+      const posts = await fastify.db.posts.findMany({key: 'userId', equals:userId});
+      posts.forEach(async(i) => await fastify.db.posts.delete(i.id));
+
+      const profiles = await fastify.db.profiles.findMany({key: 'userId', equals:userId});
+      profiles.forEach(async(i) => await fastify.db.profiles.delete(i.id));
       
       return fastify.db.users.delete(userId);
     }
@@ -104,12 +119,17 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
 
       if (!paramUser) 
         throw fastify.httpErrors.notFound('This user does not exist!');
+
       if (!validate(request.body.userId)) throw fastify.httpErrors.badRequest('badRequest: id not validate!');
 
       let bodyUser = await fastify.db.users.findOne({key:'id', equals:request.body.userId});
       if (!bodyUser) 
         throw fastify.httpErrors.notFound('This user does not exist!');
+
         const subscribedToUserIds = bodyUser.subscribedToUserIds;
+        if (!subscribedToUserIds.find(i => i === request.params.id)) 
+          throw fastify.httpErrors.badRequest('badRequest: body.userId is valid but our user is not following him!');
+
         bodyUser = { ...bodyUser, subscribedToUserIds: subscribedToUserIds.filter(i => i !== request.params.id) };
            
         return await fastify.db.users.change(request.body.userId, bodyUser);

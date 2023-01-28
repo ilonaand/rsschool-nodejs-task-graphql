@@ -197,6 +197,7 @@ test('users', async (t) => {
       t.ok(resReceivedUser1.statusCode === 404);
 
       const { body: receivedUser2 } = await getUser(app, user2.id);
+     
       t.ok(!receivedUser2.subscribedToUserIds.includes(user1.id));
 
       const { res: resReceivedProfile1 } = await getProfile(app, profile1.id);
