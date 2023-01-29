@@ -1,6 +1,13 @@
-import { user } from './users';
+import { user, userInputType } from './users';
 import { post } from './posts';
 import { memberType } from './memberTypes';
-import { profile } from './profiles';
+import { profile, profileInputType } from './profiles';
 
-export { user, post, memberType, profile };
+export { 
+  user, 
+  post, 
+  memberType, 
+  profile, 
+  userInputType, 
+  profileInputType 
+};
