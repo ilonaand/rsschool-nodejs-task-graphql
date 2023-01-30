@@ -10,7 +10,7 @@ If the properties of the entity are not specified, then return the id of it.
 `userSubscribedTo` - these are users that the current user is following.  
 `subscribedToUser` - these are users who are following the current user.  
 
-    DONE 2.1, 2.2, 2.8-2.11, 2.12-2.15, 2.17 
+    DONE 2.1, 2.2, 2.8-2.11, 2.12-2.17 
     ( Base is empty; before use you need create entities 
     by mutations in 2.8-2.10 and later change ID in queries )
 
@@ -247,7 +247,55 @@ If the properties of the entity are not specified, then return the id of it.
         }
       }
     ```
-   2.16. Subscribe to; unsubscribe from.  
+   2.16. Subscribe to
+      QUERY:
+
+    ```yaml 
+      mutation SubscripedToUser ($toUser: SubscribedToUser!) {
+         subscribedToUser(toUser: $toUser) {
+            id,  
+            firstName,
+            subscribedToUserIds
+         }
+      }
+    ```
+    Variables:
+
+    ```yaml 
+         {
+         "toUser": {
+            "id": "2c73eb20-fa60-4af4-babb-6ecacd0608f8",
+            "subscribedToUserId": 
+            "21738905-4bcd-41f4-82b5-cd9084303d66"
+            }
+         }
+    ```
+   
+   unsubscribe from.  
+
+    QUERY:
+
+    ```yaml 
+         mutation UnSubscripedToUser ($toUser: UnsubscribedToUser!) {
+            unsubscribedToUser(toUser: $toUser) {
+               id,  
+               firstName,
+               subscribedToUserIds
+            }
+            }
+    ```
+    Variables:
+
+    ```yaml 
+         {
+         "toUser": {
+            "id": "2c73eb20-fa60-4af4-babb-6ecacd0608f8",
+            "unsubscribedToUserId": 
+            "21738905-4bcd-41f4-82b5-cd9084303d66"
+             }
+         }
+    ```
+     
    2.17. [InputObjectType](https://graphql.org/graphql-js/type/#graphqlinputobjecttype) for DTOs.  
 
 

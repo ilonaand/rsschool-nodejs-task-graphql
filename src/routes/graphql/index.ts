@@ -11,7 +11,9 @@ import {
   userUpdateType,
   postUpdateType,
   profileUpdateType, 
-  memberTypeUpdate 
+  memberTypeUpdate,
+  subscribedToUser,
+  unsubscribedToUser, 
 } from './types';
 
 import {
@@ -336,6 +338,107 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
               );
 
               return newMemberType;
+            },
+          },
+          subscribedToUser: {
+            type: user,
+            args: {
+              toUser: { type: subscribedToUser },
+            },
+            async resolve(_, args) {
+              const user = await fastify.db.users.findOne({
+                key: 'id',
+                equals: args.toUser.id,
+              });
+
+              if (!user) {
+                throw fastify.httpErrors.notFound('User does not exist!');
+              }
+
+              const subscribeToUser = await fastify.db.users.findOne({
+                key: 'id',
+                equals: args.toUser.subscribedToUserId,
+              });
+
+              if (!subscribeToUser) {
+                throw fastify.httpErrors.notFound(
+                  'subscribeToUser does not exist!',
+                );
+              }
+
+              if (args.toUser.id === args.toUser.subscribedToUserId) {
+                throw fastify.httpErrors.badRequest('You try subscribe to yourself');
+              }
+
+              if (subscribeToUser.subscribedToUserIds.includes(args.toUser.id)) {
+                throw fastify.httpErrors.badRequest('User already subscribed');
+              }
+
+              const updateUser = await fastify.db.users.change(
+                args.toUser.subscribedToUserId,
+                {
+                  subscribedToUserIds: [
+                    ...subscribeToUser.subscribedToUserIds,
+                    args.toUser.id,
+                  ],
+                },
+              );
+
+              return updateUser;
+            },
+          },
+          unsubscribedToUser: {
+            type: user,
+            args: {
+             toUser: { type: unsubscribedToUser }
+            },
+            async resolve(_, args) {
+              const user = await fastify.db.users.findOne({
+                key: 'id',
+                equals: args.toUser.id,
+              });
+
+              if (!user) {
+                throw fastify.httpErrors.notFound('User does not exist!');
+              }
+
+              let unsubscribeToUser = await fastify.db.users.findOne({
+                key: 'id',
+                equals: args.toUser.unsubscribedToUserId,
+              });
+
+              if (!unsubscribeToUser) {
+                throw fastify.httpErrors.notFound(
+                  'unsubscribeToUser does not exist!',
+                );
+              }
+
+              if (args.toUser.id === args.toUser.unsubscribedToUserId) {
+                throw fastify.httpErrors.badRequest(
+                  'You try unsubscribe to yourself',
+                );
+              }
+
+              try {
+                const subscribedToUserIds = unsubscribeToUser.subscribedToUserIds;
+                if (!subscribedToUserIds.find(i => i === args.toUser.id)) 
+                  throw fastify.httpErrors.badRequest('userId is valid but our user is not following him!');
+
+                unsubscribeToUser = { ...unsubscribeToUser, 
+                  subscribedToUserIds: subscribedToUserIds.filter(i => i !== args.toUser.id) };
+
+                const updateUser = await fastify.db.users.change(
+                  args.toUser.unsubscribedToUserId,
+                  {
+                    subscribedToUserIds:
+                      unsubscribeToUser.subscribedToUserIds,
+                  },
+                );
+
+                return updateUser;
+              } catch (err: any) {
+                throw fastify.httpErrors.badRequest(err.message);
+              }
             },
           },
         },

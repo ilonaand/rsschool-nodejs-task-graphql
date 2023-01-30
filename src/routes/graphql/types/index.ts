@@ -1,4 +1,4 @@
-import { user, userInputType, userUpdateType } from './users';
+import { user, userInputType, userUpdateType, subscribedToUser, unsubscribedToUser } from './users';
 import { post, postInputType, postUpdateType } from './posts';
 import { memberType, memberTypeUpdate } from './memberTypes';
 import { profile, profileInputType, profileUpdateType } from './profiles';
@@ -15,4 +15,6 @@ export {
   postUpdateType,
   profileUpdateType,
   memberTypeUpdate,
+  subscribedToUser,
+  unsubscribedToUser,
 };

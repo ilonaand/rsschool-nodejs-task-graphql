@@ -36,3 +36,19 @@ export const userUpdateType = new GraphQLInputObjectType({
     email: { type: GraphQLString },
   }
 });
+
+export const subscribedToUser = new GraphQLInputObjectType({
+  name: 'SubscribedToUser',
+  fields: {
+    id: { type: new GraphQLNonNull(GraphQLID) },
+    subscribedToUserId: { type: new GraphQLNonNull(GraphQLID) },
+  }
+});
+
+export const unsubscribedToUser = new GraphQLInputObjectType({
+  name: 'UnsubscribedToUser',
+  fields: {
+    id: { type: new GraphQLNonNull(GraphQLID) },
+    unsubscribedToUserId: { type: new GraphQLNonNull(GraphQLID) },
+  }
+});
