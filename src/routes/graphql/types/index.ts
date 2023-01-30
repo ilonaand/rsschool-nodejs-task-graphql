@@ -1,7 +1,7 @@
-import { user, userInputType } from './users';
-import { post } from './posts';
-import { memberType } from './memberTypes';
-import { profile, profileInputType } from './profiles';
+import { user, userInputType, userUpdateType } from './users';
+import { post, postInputType, postUpdateType } from './posts';
+import { memberType, memberTypeUpdate } from './memberTypes';
+import { profile, profileInputType, profileUpdateType } from './profiles';
 
 export { 
   user, 
@@ -9,5 +9,10 @@ export {
   memberType, 
   profile, 
   userInputType, 
-  profileInputType 
+  profileInputType,
+  postInputType,
+  userUpdateType, 
+  postUpdateType,
+  profileUpdateType,
+  memberTypeUpdate,
 };

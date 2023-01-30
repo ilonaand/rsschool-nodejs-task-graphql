@@ -6,7 +6,12 @@ import {
   memberType, 
   profile, 
   userInputType, 
-  profileInputType 
+  profileInputType,
+  postInputType,
+  userUpdateType,
+  postUpdateType,
+  profileUpdateType, 
+  memberTypeUpdate 
 } from './types';
 
 import {
@@ -158,6 +163,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
               return user;
             },
           },
+
           createProfile: {
             type: profile,
             args: { 
@@ -205,6 +211,131 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
               });
 
               return profile;
+            },
+          },
+
+          createPost: {
+            type: post,
+            args: { 
+              post: { 
+                type: new GraphQLNonNull(postInputType) 
+              }
+            },
+            async resolve(_, args) {
+              const user = await fastify.db.users.findOne({key:'id', equals:args.post.userId}); 
+              if (!user) 
+                throw fastify.httpErrors.notFound('User does not exist!');
+
+              const post = await fastify.db.posts.create({
+                  userId: args.post.userId,
+                  title: args.post.title,
+                  content: args.post.content,
+                });
+
+              return post;
+            },
+          },
+
+          updateUser: {
+            type: user,
+            args: {
+              user: {
+                type: new GraphQLNonNull(userUpdateType)
+              }
+            },
+            async resolve(_, args) {
+              const user = await fastify.db.users.findOne({
+                key: 'id',
+                equals: args.user.id,
+              });
+
+              if (!user) {
+                throw fastify.httpErrors.notFound('User does not exist!');
+              }
+
+              const newUser = await fastify.db.users.change(args.user.id, args.user);
+
+              return newUser;
+            },
+          },
+
+          updateProfile: {
+            type: profile,
+            args: {
+              profile: {
+                type: new GraphQLNonNull(profileUpdateType)
+              },
+            },
+            async resolve(_, args) {
+              const profile = await fastify.db.profiles.findOne({
+                key: 'id',
+                equals: args.profile.id,
+              });
+
+              if (!profile) {
+                throw fastify.httpErrors.notFound('Profile does not exist!');
+              }
+
+              const memberType = await fastify.db.memberTypes.findOne({
+                key: 'id',
+                equals: args.profile.memberTypeId,
+              });
+
+              if (!memberType && args.profile.memberTypeId) {
+                throw fastify.httpErrors.notFound('MemberType does not exist!');
+              }
+
+              const newProfile = await fastify.db.profiles.change(
+                args.profile.id,
+                args.profile,
+              );
+
+              return newProfile;
+            },
+          },
+
+          updatePost: {
+            type: post,
+            args: {
+              post: { type: new GraphQLNonNull(postUpdateType) },
+            },
+            async resolve(_, args) {
+              const post = await fastify.db.posts.findOne({
+                key: 'id',
+                equals: args.post.id,
+              });
+
+              if (!post) {
+                throw fastify.httpErrors.notFound('Post does not exist!');
+              }
+
+              const newPost = await fastify.db.posts.change(args.post.id, args.post);
+
+              return newPost;
+            },
+          },
+
+          updateMemberTypes: {
+            type: memberType,
+            args: {
+              memberType: { type: memberTypeUpdate }
+            },
+            async resolve(_, args) {
+              const memberType = await fastify.db.memberTypes.findOne({
+                key: 'id',
+                equals: args.memberType.id,
+              });
+
+              if (!memberType) {
+                throw fastify.httpErrors.notFound('MemberType does not exist!');
+              }
+
+              const newMemberType = await fastify.db.memberTypes.change(
+                args.memberType.id,
+                args.memberType,
+              );
+
+              return newMemberType;
             },
           },
         },

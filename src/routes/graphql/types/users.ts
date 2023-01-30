@@ -1,4 +1,11 @@
-import { GraphQLList, GraphQLObjectType, GraphQLString, GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
+import { 
+  GraphQLList, 
+  GraphQLObjectType, 
+  GraphQLString, 
+  GraphQLInputObjectType, 
+  GraphQLNonNull, 
+  GraphQLID 
+} from 'graphql';
 
 export const user = new GraphQLObjectType({
   name: 'User',
@@ -17,5 +24,15 @@ export const userInputType = new GraphQLInputObjectType({
     firstName: { type: new GraphQLNonNull(GraphQLString) },
     lastName: { type: new GraphQLNonNull(GraphQLString) },
     email: { type: new GraphQLNonNull(GraphQLString) },
+  }
+});
+
+export const userUpdateType = new GraphQLInputObjectType({
+  name: 'UserUpdate',
+  fields: {
+    id: { type: new GraphQLNonNull(GraphQLID) },
+    firstName: { type: GraphQLString },
+    lastName: { type: GraphQLString },
+    email: { type: GraphQLString },
   }
 });
