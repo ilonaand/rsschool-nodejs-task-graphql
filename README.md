@@ -1,7 +1,7 @@
 ## Assignment: Graphql
 ### Tasks:
 1. Add logic to the restful endpoints (users, posts, profiles, member-types folders in ./src/routes).  
-   1.1. npm run test - 100%  
+   1.1. npm run test - 100%  - DONE
 2. Add logic to the graphql endpoint (graphql folder in ./src/routes).  
 Constraints and logic for gql queries should be done based on restful implementation.  
 For each subtask provide an example of POST body in the PR.  
@@ -9,68 +9,293 @@ All dynamic values should be sent via "variables" field.
 If the properties of the entity are not specified, then return the id of it.  
 `userSubscribedTo` - these are users that the current user is following.  
 `subscribedToUser` - these are users who are following the current user.  
+
+    DONE 2.1, 2.2, 2.8-2.11, 2.12-2.17 
+    ( Base is empty; before use you need create entities 
+    by mutations in 2.8-2.10 and later change ID in queries )
+
    
    * Get gql requests:  
    2.1. Get users, profiles, posts, memberTypes - 4 operations in one query.  
+   QUERY:
+
+   ```yaml 
+   query All {
+         users {
+            id
+         }
+         posts {
+            id 
+         }
+         profiles {
+            id
+         }
+         memberTypes {
+            id,
+            discount,
+            monthPostsLimit 
+         }
+      }
+   ```
    2.2. Get user, profile, post, memberType by id - 4 operations in one query.  
+   QUERY:
+
+    ```yaml 
+    query allById($idUser: ID, $idProfile: ID, $idPost: ID, $idMember: ID ) {
+      user(id: $idUser) {
+         id,
+         firstName,
+         lastName,
+         email
+         },
+      profile(id: $idProfile) {
+         id,
+         userId,
+         avatar,
+         },
+      post(id: $idPost) {
+         id
+         },
+      memberType(id: $idMember) {
+         id
+         }
+      }
+    ```
+   Variables:
+
+    ```yaml 
+      {
+         "idUser": "30ad2f97-49ff-448e-a469-9ac4eaa73b84",
+         "idProfile": "c792e4fc-e64b-4eaa-9bf7-23f479499412",
+         "idPost": "46e512f2-0047-4ae0-8c7f-1e6bb7d0467f",
+         "idMember": "basic"
+     }
+    ```
    2.3. Get users with their posts, profiles, memberTypes.  
    2.4. Get user by id with his posts, profile, memberType.  
    2.5. Get users with their `userSubscribedTo`, profile.  
    2.6. Get user by id with his `subscribedToUser`, posts.  
    2.7. Get users with their `userSubscribedTo`, `subscribedToUser` (additionally for each user in `userSubscribedTo`, `subscribedToUser` add their `userSubscribedTo`, `subscribedToUser`).  
    * Create gql requests:   
-   2.8. Create user.  
-   2.9. Create profile.  
+   2.8. Create user. 
+   QUERY:
+
+    ```yaml 
+      mutation AddNewUser ($user: UserInput!) {
+         createUser(user: $user) {
+            id,  
+            firstName,
+            lastName,
+            email
+         }
+      }
+    ```
+    Variables:
+
+    ```yaml 
+         {
+         "user": {
+            "firstName":"jan",
+            "lastName":"Gettings",
+            "email": "false@gmail.com"
+         }
+      }
+    ```
+
+   2.9. Create profile.
+   QUERY:
+
+    ```yaml 
+    mutation AddNewProfile ($profile: ProfileInput!) {
+      createProfile(profile: $profile) {
+         id,  
+         avatar
+        }
+      }
+
+    ```
+    Variables:
+
+    ```yaml
+      {
+         "profile": {
+            "avatar":"jan.png",
+            "sex": "male",
+            "birthday": 24,
+            "country": "РБ",
+            "street": "Голубева",
+            "city": "Минск",
+            "userId": "06226f75-1484-4a3d-aa65-e59a00d42c82",
+            "memberTypeId": "basic"
+         }
+      } 
+    ```  
    2.10. Create post.  
+   QUERY:
+
+    ```yaml 
+      mutation AddNewPost ($post: PostInput!) {
+         createPost(post: $post) {
+            id,
+            content
+            }
+         }
+    ```
+    Variables:
+
+    ```yaml 
+      {
+         "post": {
+            "title": "Название",
+            "content": "Content",
+            "userId": "06226f75-1484-4a3d-aa65-e59a00d42c82"
+         }
+      }
+    ```
    2.11. [InputObjectType](https://graphql.org/graphql-js/type/#graphqlinputobjecttype) for DTOs.  
    * Update gql requests:  
    2.12. Update user.  
+   QUERY:
+
+    ```yaml 
+      mutation UpdateUser ($user: UserUpdate!) {
+         updateUser(user: $user) {
+            id,  
+            firstName,
+            lastName,
+            email
+            }
+         }
+    ```
+    Variables:
+
+    ```yaml 
+      {
+         "user": {
+            "id": "30ad2f97-49ff-448e-a469-9ac4eaa73b84",
+            "email": "miller@gmail.com"
+         }
+      }
+    ```
    2.13. Update profile.  
+   QUERY:
+
+    ```yaml 
+      mutation UpdateProfile ($profile: ProfileUpdate!) {
+         updateProfile(profile: $profile) {
+            id,  
+            avatar,
+            memberTypeId
+         }
+      }
+    ```
+    Variables:
+
+    ```yaml 
+      {
+      "profile": {
+         "id": "312a0db4-4b4b-494b-8d22-156507f44202",
+         "avatar": "ava.jpg",
+         "memberTypeId": "basic"
+        }
+      }
+    ```
    2.14. Update post.  
+   QUERY:
+
+    ```yaml 
+      mutation UpdatePost ($post: PostUpdate!) {
+         updatePost(post: $post) {
+            id,  
+            title,
+            content
+         }
+      }
+    ```
+    Variables:
+
+    ```yaml 
+      {
+         "post": {
+            "id": "19035e8f-bed4-4f00-825d-751e20e7104d",
+            "title": "Тема",
+            "content": "Интересный"
+            
+         }
+      }
+    ```
    2.15. Update memberType.  
-   2.16. Subscribe to; unsubscribe from.  
+   QUERY:
+
+    ```yaml 
+      mutation UpdateMmemberType ($memberType: MemberTypeUpdate!) {
+         updateMemberTypes(memberType: $memberType) {
+            id,  
+            discount,
+            monthPostsLimit
+         }
+      }
+    ```
+    Variables:
+
+    ```yaml 
+            {
+      "memberType": {
+         "id": "basic",
+         "discount": 2,
+         "monthPostsLimit": 10
+        }
+      }
+    ```
+   2.16. Subscribe to
+      QUERY:
+
+    ```yaml 
+      mutation SubscripedToUser ($toUser: SubscribedToUser!) {
+         subscribedToUser(toUser: $toUser) {
+            id,  
+            firstName,
+            subscribedToUserIds
+         }
+      }
+    ```
+    Variables:
+
+    ```yaml 
+         {
+         "toUser": {
+            "id": "2c73eb20-fa60-4af4-babb-6ecacd0608f8",
+            "subscribedToUserId": 
+            "21738905-4bcd-41f4-82b5-cd9084303d66"
+            }
+         }
+    ```
+   
+   unsubscribe from.  
+
+    QUERY:
+
+    ```yaml 
+         mutation UnSubscripedToUser ($toUser: UnsubscribedToUser!) {
+            unsubscribedToUser(toUser: $toUser) {
+               id,  
+               firstName,
+               subscribedToUserIds
+            }
+            }
+    ```
+    Variables:
+
+    ```yaml 
+         {
+         "toUser": {
+            "id": "2c73eb20-fa60-4af4-babb-6ecacd0608f8",
+            "unsubscribedToUserId": 
+            "21738905-4bcd-41f4-82b5-cd9084303d66"
+             }
+         }
+    ```
+     
    2.17. [InputObjectType](https://graphql.org/graphql-js/type/#graphqlinputobjecttype) for DTOs.  
 
-3. Solve `n+1` graphql problem with [dataloader](https://www.npmjs.com/package/dataloader) package in all places where it should be used.  
-   You can use only one "findMany" call per loader to consider this task completed.  
-   It's ok to leave the use of the dataloader even if only one entity was requested. But additionally (no extra score) you can optimize the behavior for such cases => +1 db call is allowed per loader.  
-   3.1. List where the dataloader was used with links to the lines of code (creation in gql context and call in resolver).  
-4. Limit the complexity of the graphql queries by their depth with [graphql-depth-limit](https://www.npmjs.com/package/graphql-depth-limit) package.   
-   4.1. Provide a link to the line of code where it was used.  
-   4.2. Specify a POST body of gql query that ends with an error due to the operation of the rule. Request result should be with `errors` field (and with or without `data:null`) describing the error.  
 
-### Description:  
-All dependencies to complete this task are already installed.  
-You are free to install new dependencies as long as you use them.  
-App template was made with fastify, but you don't need to know much about fastify to get the tasks done.  
-All templates for restful endpoints are placed, just fill in the logic for each of them.  
-Use the "db" property of the "fastify" object as a database access methods ("db" is an instance of the DB class => ./src/utils/DB/DB.ts).  
-Body, params have fixed structure for each restful endpoint due to jsonSchema (schema.ts files near index.ts).  
-
-### Description for the 1 task:
-If the requested entity is missing - send 404 http code.  
-If operation cannot be performed because of the client input - send 400 http code.  
-You can use methods of "reply" to set http code or throw an [http error](https://github.com/fastify/fastify-sensible#fastifyhttperrors).  
-If operation is successfully completed, then return an entity or array of entities from http handler (fastify will stringify object/array and will send it).  
-
-Relation fields are only stored in dependent/child entities. E.g. profile stores "userId" field.  
-You are also responsible for verifying that the relations are real. E.g. "userId" belongs to the real user.  
-So when you delete dependent entity, you automatically delete relations with its parents.  
-But when you delete parent entity, you need to delete relations from child entities yourself to keep the data relevant.   
-(In the next rss-school task, you will use a full-fledged database that also can automatically remove child entities when the parent is deleted, verify keys ownership and instead of arrays for storing keys, you will use additional "join" tables)  
-
-To determine that all your restful logic works correctly => run the script "npm run test".  
-But be careful because these tests are integration (E.g. to test "delete" logic => it creates the entity via a "create" endpoint).  
-
-### Description for the 2 task:  
-You are free to create your own gql environment as long as you use predefined graphql endpoint (./src/routes/graphql/index.ts).  
-(or stick to the [default code-first](https://github.dev/graphql/graphql-js/blob/ffa18e9de0ae630d7e5f264f72c94d497c70016b/src/__tests__/starWarsSchema.ts))  
-
-### Description for the 3 task:
-If you have chosen a non-default gql environment, then the connection of some functionality may differ, be sure to report this in the PR.  
-
-### Description for the 4 task:  
-If you have chosen a non-default gql environment, then the connection of some functionality may differ, be sure to report this in the PR.  
-Limit the complexity of the graphql queries by their depth with "graphql-depth-limit" package.  
-E.g. User can refer to other users via properties `userSubscribedTo`, `subscribedToUser` and users within them can also have `userSubscribedTo`, `subscribedToUser` and so on.  
-Your task is to add a new rule (created by "graphql-depth-limit") in [validation](https://graphql.org/graphql-js/validation/) to limit such nesting to (for example) 6 levels max.
