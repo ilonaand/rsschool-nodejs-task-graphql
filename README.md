@@ -12,7 +12,7 @@ If the properties of the entity are not specified, then return the id of it.
 
     DONE 2.1, 2.2, 2.8-2.11, 2.12-2.15, 2.17 
     ( Base is empty; before use you need create entities 
-    by mutations in 2.8-2.10 and later change ID in queryes )
+    by mutations in 2.8-2.10 and later change ID in queries )
 
    
    * Get gql requests:  
